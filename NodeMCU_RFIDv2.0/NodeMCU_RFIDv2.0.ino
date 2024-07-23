@@ -40,7 +40,11 @@ const char *device_token = "f0d27163a1cae5f3";
 String URL = "http://192.168.52.29/AC-Controller/getdata.php";  // computer IP or the server domain
 String getData, Link;
 String OldCardID = "";
+String currentCardID = ""; // Track the currently logged-in card ID
+String loggedInUserName = ""; // Track the username of the logged-in user
 unsigned long previousMillis = 0;
+unsigned long lastSendMillis = 0;
+const long interval = 180000; // Interval at which to send HTTP requests (3 minutes = 180000 milliseconds)
 //************************************************************************
 
 
@@ -65,38 +69,52 @@ void setup() {
 }
 //************************************************************************
 void loop() {
+  unsigned long currentMillis = millis();
+
   // check if there's a connection to Wi-Fi or not
   if (!WiFi.isConnected()) {
     connectToWiFi();  // Retry to connect to Wi-Fi
   }
-  //---------------------------------------------
-  if (millis() - previousMillis >= 15000) {
-    previousMillis = millis();
+
+  // Handle periodic sending of data
+  if (currentMillis - lastSendMillis >= interval && currentCardID != "") {
+    lastSendMillis = currentMillis;
+    SendLoggedInUser();  // Send the logged-in username and device token
+  }
+
+  if (currentMillis - previousMillis >= 15000) {
+    previousMillis = currentMillis;
     OldCardID = "";
   }
+
   delay(50);
-  //---------------------------------------------
+
   // look for new card
   if (!mfrc522.PICC_IsNewCardPresent()) {
     return;  // go to start of loop if there is no card present
   }
+
   // Select one of the cards
   if (!mfrc522.PICC_ReadCardSerial()) {
     return;  // if read card serial(0) returns 1, the uid struct contains the ID of the read card.
   }
+
   String CardID = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
     CardID += mfrc522.uid.uidByte[i];
   }
-  //---------------------------------------------
+
   if (CardID == OldCardID) {
     return;
   } else {
     OldCardID = CardID;
   }
-  //---------------------------------------------
-  SendCardID(CardID);
-  delay(1000);
+
+  if (CardID != currentCardID) {
+    // Send the new card ID
+    SendCardID(CardID);
+    delay(10z00);
+  }
 }
 //************send the Card UID to the website*************
 void SendCardID(String Card_uid) {
@@ -137,6 +155,8 @@ void SendCardID(String Card_uid) {
         Serial.print("LED3 State: ");
         Serial.println(led3State ? "ON" : "OFF");
 
+        currentCardID = Card_uid; // Update the current card ID
+        loggedInUserName = user_name; // Store the username of the logged-in user
       } else if (payload.substring(0, 6) == "logout") {
         String user_name = payload.substring(6);
         Serial.println(user_name);
@@ -156,9 +176,12 @@ void SendCardID(String Card_uid) {
         Serial.print("LED3 State: ");
         Serial.println(led3State ? "ON" : "OFF");
 
-
+        currentCardID = ""; // Clear the current card ID after logout
+        loggedInUserName = ""; // Clear the logged-in username
       } else if (payload == "successful") {
+        // Handle successful addition of new card if necessary
       } else if (payload == "available") {
+        // Handle the availability of the card if necessary
       }
 
       delay(100);
@@ -166,6 +189,30 @@ void SendCardID(String Card_uid) {
     }
   }
 }
+
+//************send the logged-in user data to the website periodically*************
+void SendLoggedInUser() {
+  if (WiFi.isConnected()) {
+    HTTPClient http;  // Declare object of class HTTPClient
+    WiFiClient client;
+    // GET Data
+    getData = "?username=" + String(loggedInUserName) + "&device_token=" + String(device_token);  // Add the username and device token to the GET array in order to send it
+    // GET method
+    Link = URL + getData;
+    http.begin(client, Link);  // initiate HTTP request   //Specify content-type header
+
+    int httpCode = http.GET();          // Send the request
+    String payload = http.getString();  // Get the response payload
+
+    Serial.println(httpCode);  // Print HTTP return code
+    Serial.println(loggedInUserName);  // Print logged-in username
+    Serial.println(payload);   // Print request response payload
+
+    delay(100);
+    http.end();  // Close connection
+  }
+}
+
 //********************connect to the WiFi******************
 void connectToWiFi() {
   WiFi.mode(WIFI_OFF);  // Prevents reconnection issue (taking too long to connect)
