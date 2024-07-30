@@ -39,6 +39,26 @@ if (isset($_GET['card_uid']) && isset($_GET['device_token'])) {
                             if ($row['device_uid'] == $device_uid || $row['device_uid'] == 0) {
                                 $Uname = $row['username'];
                                 $Number = $row['remaining_time'];
+
+                                // Check if another user is already logged in on this device
+                                $sql = "SELECT * FROM users_logs WHERE device_uid=? AND checkindate=? AND card_out=0";
+                                $result = mysqli_stmt_init($conn);
+                                if (!mysqli_stmt_prepare($result, $sql)) {
+                                    echo "SQL_Error_Select_logs";
+                                    exit();
+                                } else {
+                                    mysqli_stmt_bind_param($result, "ss", $device_uid, $d);
+                                    mysqli_stmt_execute($result);
+                                    $resultl = mysqli_stmt_get_result($result);
+                                    if ($existing_log = mysqli_fetch_assoc($resultl)) {
+                                        // Another user is already logged in
+                                        if ($existing_log['card_uid'] != $card_uid) {
+                                            echo "Device in use by another user";
+                                            exit();
+                                        }
+                                    }
+                                }
+
                                 $sql = "SELECT * FROM users_logs WHERE card_uid=? AND checkindate=? AND card_out=0";
                                 $result = mysqli_stmt_init($conn);
                                 if (!mysqli_stmt_prepare($result, $sql)) {
