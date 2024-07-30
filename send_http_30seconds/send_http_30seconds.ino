@@ -23,8 +23,9 @@ const char *ssid = "Raj";
 const char *password = "12345678";
 const char *device_token = "f0d27163a1cae5f3";
 
-// URL for the server
-String URL = "http://192.168.128.29/AC-Controller/getdata.php";
+// URLs for the server
+String loginURL = "http://192.168.128.29/AC-Controller/getdata.php";
+String keepAliveURL = "http://192.168.128.29/AC-Controller/user.php";
 String getData, Link;
 String OldCardID = ""; // To track the previous card ID
 String currentCardID = ""; // To track the currently logged-in card ID
@@ -33,7 +34,7 @@ String loggedInUserName = ""; // To track the username of the logged-in user
 // Timing variables for periodic tasks
 unsigned long previousMillis = 0;
 unsigned long lastSendMillis = 0;
-const long interval = 180000; // Interval to send HTTP requests (3 minutes)
+const long interval = 30000; // Interval to send HTTP requests (30 seconds)
 
 // Setup function
 void setup() {
@@ -123,7 +124,7 @@ void SendCardID(String Card_uid) {
     
     // Construct GET request URL
     getData = "?card_uid=" + String(Card_uid) + "&device_token=" + String(device_token);
-    Link = URL + getData;
+    Link = loginURL + getData;
     http.begin(client, Link);
     
     int httpCode = http.GET(); // Send the request
@@ -159,7 +160,7 @@ void logoutUser() {
     
     // Construct GET request URL with logout parameter
     getData = "?card_uid=" + String(currentCardID) + "&device_token=" + String(device_token) + "&logout=true";
-    Link = URL + getData;
+    Link = loginURL + getData;
     http.begin(client, Link);
     
     int httpCode = http.GET(); // Send the request
@@ -194,7 +195,7 @@ void SendLoggedInUser() {
     
     // Construct GET request URL
     getData = "?username=" + String(loggedInUserName) + "&device_token=" + String(device_token);
-    Link = URL + getData;
+    Link = keepAliveURL + getData;
     http.begin(client, Link);
     
     int httpCode = http.GET(); // Send the request
