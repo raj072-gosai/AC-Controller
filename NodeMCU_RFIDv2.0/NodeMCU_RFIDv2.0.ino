@@ -5,6 +5,7 @@
 // NodeMCU--------------------------
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
+#include <EEPROM.h>  // Include the EEPROM library
 //************************************************************************
 // D2   sda/ss
 // d5   sck
@@ -14,21 +15,13 @@
 // d1   rst
 // 3v    3.3v
 
-// LED1   D3
-// LED2   D4
-// LED3   D8
+// led   d3
 //************************************************************************
 
-#define SS_PIN D2   //
-#define RST_PIN D1  //
-#define LED1_PIN D3
-#define LED2_PIN D4
-#define LED3_PIN D8
-
-bool led1State = true;  // Initial state of LED1
-bool led2State = true;  // Initial state of LED2
-bool led3State = true;  // Initial state of LED3
-
+#define SS_PIN D2   // 
+#define RST_PIN D1  // 
+#define LED_PIN D8   //D3
+bool ledState = true;  // Initial state of the LED
 //************************************************************************
 MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance.
 //************************************************************************
@@ -37,31 +30,26 @@ const char *ssid = "Raj";
 const char *password = "12345678";
 const char *device_token = "f0d27163a1cae5f3";
 //************************************************************************
-String URL = "http://192.168.217.29/AC-Controller/getdata.php";  // computer IP or the server domain
+String URL = "http://192.168.52.29/rfidattendance/getdata.php";  // computer IP or the server domain
 String getData, Link;
 String OldCardID = "";
-String currentCardID = ""; // Track the currently logged-in card ID
-String loggedInUserName = ""; // Track the username of the logged-in user
 unsigned long previousMillis = 0;
-unsigned long lastSendMillis = 0;
-const long interval = 180000; // Interval at which to send HTTP requests (3 minutes = 180000 milliseconds)
 //************************************************************************
 
 
 //************************************************************************
 void setup() {
   delay(1000);
-
+  
   Serial.begin(115200);
-
-  pinMode(LED1_PIN, OUTPUT);
-  pinMode(LED2_PIN, OUTPUT);
-  pinMode(LED3_PIN, OUTPUT);
-
-  digitalWrite(LED1_PIN, HIGH);
-  digitalWrite(LED2_PIN, HIGH);
-  digitalWrite(LED3_PIN, HIGH);
-
+  
+  pinMode(LED_PIN, OUTPUT);
+  // digitalWrite(LED_PIN, HIGH);
+  // Initialize LED state from EEPROM
+  EEPROM.begin(1);
+  ledState = EEPROM.read(0);
+  Serial.println(ledState);
+  digitalWrite(LED_PIN, ledState ? HIGH : LOW);
   connectToWiFi();
   SPI.begin();         // Init SPI bus
   mfrc522.PCD_Init();  // Init MFRC522 card
@@ -69,52 +57,39 @@ void setup() {
 }
 //************************************************************************
 void loop() {
-  unsigned long currentMillis = millis();
-
   // check if there's a connection to Wi-Fi or not
   if (!WiFi.isConnected()) {
     connectToWiFi();  // Retry to connect to Wi-Fi
   }
-
-  // Handle periodic sending of data
-  if (currentMillis - lastSendMillis >= interval && currentCardID != "") {
-    lastSendMillis = currentMillis;
-    SendLoggedInUser();  // Send the logged-in username and device token
-  }
-
-  if (currentMillis - previousMillis >= 15000) {
-    previousMillis = currentMillis;
+  //---------------------------------------------
+  if (millis() - previousMillis >= 15000) {
+    previousMillis = millis();
     OldCardID = "";
   }
-
   delay(50);
-
+  //---------------------------------------------
   // look for new card
   if (!mfrc522.PICC_IsNewCardPresent()) {
-    return;  // go to start of loop if there is no card present
+    return;  // got to start of loop if there is no card present
   }
-
   // Select one of the cards
   if (!mfrc522.PICC_ReadCardSerial()) {
-    return;  // if read card serial(0) returns 1, the uid struct contains the ID of the read card.
+    return;  // if read card serial(0) returns 1, the uid struct contians the ID of the read card.
   }
-
   String CardID = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
     CardID += mfrc522.uid.uidByte[i];
   }
-
+  //---------------------------------------------
   if (CardID == OldCardID) {
     return;
   } else {
     OldCardID = CardID;
   }
-
-  if (CardID != currentCardID) {
-    // Send the new card ID
-    SendCardID(CardID);
-    delay(1000);
-  }
+  //---------------------------------------------
+  //  Serial.println(CardID);
+  SendCardID(CardID);
+  delay(1000);
 }
 //************send the Card UID to the website*************
 void SendCardID(String Card_uid) {
@@ -124,13 +99,14 @@ void SendCardID(String Card_uid) {
     WiFiClient client;
     // GET Data
     getData = "?card_uid=" + String(Card_uid) + "&device_token=" + String(device_token);  // Add the Card ID to the GET array in order to send it
-    // GET method
+    // GET methode
     Link = URL + getData;
     http.begin(client, Link);  // initiate HTTP request   //Specify content-type header
 
     int httpCode = http.GET();          // Send the request
     String payload = http.getString();  // Get the response payload
 
+    //    Serial.println(Link);   //Print HTTP return code
     Serial.println(httpCode);  // Print HTTP return code
     Serial.println(Card_uid);  // Print Card ID
     Serial.println(payload);   // Print request response payload
@@ -140,79 +116,34 @@ void SendCardID(String Card_uid) {
         String user_name = payload.substring(5);
         Serial.println(user_name);
 
-        led1State = !led1State;
-        digitalWrite(LED1_PIN, led1State ? HIGH : LOW);
-        Serial.print("LED1 State: ");
-        Serial.println(led1State ? "ON" : "OFF");
+        ledState = !ledState;
+        EEPROM.write(0, ledState);
+        EEPROM.commit();
+        digitalWrite(LED_PIN, ledState ? HIGH : LOW);
+        Serial.println(ledState);
+        Serial.print("LED State: ");
+        Serial.println(ledState ? "ON" : "OFF");
 
-        led2State = !led2State;
-        digitalWrite(LED2_PIN, led2State ? HIGH : LOW);
-        Serial.print("LED2 State: ");
-        Serial.println(led2State ? "ON" : "OFF");
-
-        led3State = !led3State;
-        digitalWrite(LED3_PIN, led3State ? HIGH : LOW);
-        Serial.print("LED3 State: ");
-        Serial.println(led3State ? "ON" : "OFF");
-
-        currentCardID = Card_uid; // Update the current card ID
-        loggedInUserName = user_name; // Store the username of the logged-in user
       } else if (payload.substring(0, 6) == "logout") {
         String user_name = payload.substring(6);
         Serial.println(user_name);
 
-        led1State = !led1State;
-        digitalWrite(LED1_PIN, led1State ? HIGH : LOW);
-        Serial.print("LED1 State: ");
-        Serial.println(led1State ? "ON" : "OFF");
+        ledState = !ledState;
+        EEPROM.write(0, ledState);
+        EEPROM.commit();
+        digitalWrite(LED_PIN, ledState ? HIGH : LOW);
+        Serial.println(ledState);
+        Serial.print("LED State: ");
+        Serial.println(ledState ? "ON" : "OFF");
 
-        led2State = !led2State;
-        digitalWrite(LED2_PIN, led2State ? HIGH : LOW);
-        Serial.print("LED2 State: ");
-        Serial.println(led2State ? "ON" : "OFF");
-
-        led3State = !led3State;
-        digitalWrite(LED3_PIN, led3State ? HIGH : LOW);
-        Serial.print("LED3 State: ");
-        Serial.println(led3State ? "ON" : "OFF");
-
-        currentCardID = ""; // Clear the current card ID after logout
-        loggedInUserName = ""; // Clear the logged-in username
-      } else if (payload == "successful") {
-        // Handle successful addition of new card if necessary
+      } else if (payload == "succesful") {
       } else if (payload == "available") {
-        // Handle the availability of the card if necessary
       }
-
       delay(100);
       http.end();  // Close connection
     }
   }
 }
-
-//************send the logged-in user data to the website periodically*************
-void SendLoggedInUser() {
-  if (WiFi.isConnected()) {
-    HTTPClient http;  // Declare object of class HTTPClient
-    WiFiClient client;
-    // GET Data
-    getData = "?username=" + String(loggedInUserName) + "&device_token=" + String(device_token);  // Add the username and device token to the GET array in order to send it
-    // GET method
-    Link = URL + getData;
-    http.begin(client, Link);  // initiate HTTP request   //Specify content-type header
-
-    int httpCode = http.GET();          // Send the request
-    String payload = http.getString();  // Get the response payload
-
-    Serial.println(httpCode);  // Print HTTP return code
-    Serial.println(loggedInUserName);  // Print logged-in username
-    Serial.println(payload);   // Print request response payload
-
-    delay(100);
-    http.end();  // Close connection
-  }
-}
-
 //********************connect to the WiFi******************
 void connectToWiFi() {
   WiFi.mode(WIFI_OFF);  // Prevents reconnection issue (taking too long to connect)
