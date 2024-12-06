@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 27, 2024 at 11:40 AM
+-- Generation Time: Nov 20, 2024 at 08:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,8 +61,7 @@ CREATE TABLE `devices` (
 --
 
 INSERT INTO `devices` (`id`, `device_name`, `device_dep`, `device_uid`, `device_date`, `device_mode`) VALUES
-(1, 'leb-103', 'mca', 'f0d27163a1cae5f3', '2024-07-20', 0),
-(2, 'raj', 'wer', '8206ea78e0a8847d', '2024-07-27', 0);
+(1, 'leb-103', 'mca', 'f0d27163a1cae5f3', '2024-07-20', 0);
 
 -- --------------------------------------------------------
 
@@ -83,15 +82,6 @@ CREATE TABLE `users` (
   `device_dep` varchar(20) NOT NULL DEFAULT '0',
   `add_card` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `remaining_time`, `gender`, `email`, `card_uid`, `card_select`, `user_date`, `device_uid`, `device_dep`, `add_card`) VALUES
-(2, 'urvashi', 751, 'Female', 'urvashi@gmail.com', '14417820738', 0, '2024-07-20', 'f0d27163a1cae5f3', 'mca', 1),
-(3, 'ritu parekh', 9365, 'Female', 'rituparekh@gmail.com', '90e6926', 0, '2024-07-23', 'f0d27163a1cae5f3', 'mca', 1),
-(4, 'urvashi dave', 1770, 'Female', 'dave@gmail.com', '90b2cf26', 1, '2024-07-23', 'f0d27163a1cae5f3', 'mca', 1);
 
 -- --------------------------------------------------------
 
@@ -190,7 +180,43 @@ INSERT INTO `users_logs` (`id`, `username`, `remaining_time`, `card_uid`, `devic
 (70, 'urvashi dave', 1985, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-27', '14:42:56', '14:43:04', 8, 1),
 (71, 'urvashi dave', 1977, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-27', '14:43:13', '14:43:30', 17, 1),
 (72, 'ritu parekh', 9656, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-27', '14:48:20', '14:53:11', 291, 1),
-(73, 'urvashi dave', 1960, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-27', '14:54:22', '14:57:32', 190, 1);
+(73, 'urvashi dave', 1960, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-27', '14:54:22', '14:57:32', 190, 1),
+(74, 'ritu parekh', 9365, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-29', '22:29:03', '22:33:15', 252, 1),
+(75, 'ritu parekh', 9113, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-29', '22:34:34', '22:34:52', 18, 1),
+(76, 'ritu parekh', 9095, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-29', '22:35:19', '22:35:21', 2, 1),
+(77, 'ritu parekh', 9093, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-29', '22:35:37', '22:35:51', 14, 1),
+(78, 'urvashi dave', 1770, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-30', '23:59:40', '00:00:00', 0, 0),
+(79, 'urvashi dave', 1770, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:04:05', '00:10:59', 414, 1),
+(80, 'ritu parekh', 9079, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:11:56', '00:12:22', 26, 1),
+(81, 'urvashi dave', 1356, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:16:46', '00:19:21', 155, 1),
+(82, 'ritu parekh', 9053, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:35:56', '00:41:09', 313, 1),
+(83, 'ritu parekh', 8740, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:42:31', '00:45:21', 170, 1),
+(84, 'ritu parekh', 8570, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:46:04', '00:51:04', 300, 1),
+(85, 'ritu parekh', 8270, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:51:54', '00:53:08', 74, 1),
+(86, 'ritu parekh', 8196, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '00:53:57', '00:57:50', 233, 1),
+(87, 'ritu parekh', 7963, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '01:00:28', '01:10:59', 631, 1),
+(88, 'ritu parekh', 7332, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '01:11:59', '01:19:53', 474, 1),
+(89, 'urvashi dave', 1201, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '02:13:37', '02:14:09', 32, 1),
+(90, 'ritu parekh', 6858, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '02:16:09', '02:18:47', 158, 1),
+(91, 'ritu parekh', 6700, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '02:20:15', '02:34:01', 826, 1),
+(92, 'ritu parekh', 5874, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '02:34:03', '02:37:07', 184, 1),
+(93, 'ritu parekh', 5690, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-07-31', '02:43:04', '02:43:30', 26, 1),
+(94, 'ritu parekh', 5664, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:15:30', '20:19:27', 237, 1),
+(95, 'ritu parekh', 5427, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:35:57', '20:39:25', 208, 1),
+(96, 'urvashi dave', 1169, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:41:39', '20:42:12', 33, 1),
+(97, 'urvashi dave', 1136, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:42:23', '20:45:02', 159, 1),
+(98, 'urvashi dave', 977, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:46:15', '20:46:57', 42, 1),
+(99, 'urvashi dave', 935, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:48:09', '20:56:28', 499, 1),
+(100, 'urvashi dave', 436, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:56:42', '20:58:59', 137, 1),
+(101, 'ritu parekh', 5219, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '20:59:16', '21:02:25', 189, 1),
+(102, 'ritu parekh', 5030, '90e6926', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '21:08:34', '21:15:40', 426, 1),
+(103, 'urvashi dave', 299, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-01', '21:15:47', '21:19:20', 213, 1),
+(104, 'urvashi dave', 86, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-03', '16:19:39', '16:19:57', 18, 1),
+(105, 'urvashi dave', 68, '90b2cf26', 'f0d27163a1cae5f3', 'mca', '2024-08-03', '16:21:41', '16:22:00', 19, 1),
+(106, 'raj', 1000, 'e88f4bd', 'f0d27163a1cae5f3', 'mca', '2024-08-03', '17:00:22', '17:03:12', 170, 1),
+(107, 'urvashi', 751, '14417820738', 'f0d27163a1cae5f3', 'mca', '2024-10-13', '10:57:02', '10:58:50', 108, 1),
+(108, 'urvashi', 643, '14417820738', 'f0d27163a1cae5f3', 'mca', '2024-10-13', '10:58:58', '11:00:39', 101, 1),
+(109, 'urvashi', 542, '14417820738', 'f0d27163a1cae5f3', 'mca', '2024-10-13', '11:01:29', '00:00:00', 0, 0);
 
 --
 -- Indexes for dumped tables
@@ -240,13 +266,13 @@ ALTER TABLE `devices`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users_logs`
 --
 ALTER TABLE `users_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

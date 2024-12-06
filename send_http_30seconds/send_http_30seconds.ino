@@ -24,8 +24,8 @@ const char *password = "12345678";
 const char *device_token = "f0d27163a1cae5f3";
 
 // URLs for the server
-String loginURL = "http://192.168.128.29/AC-Controller/getdata.php";
-String keepAliveURL = "http://192.168.128.29/AC-Controller/user.php";
+String loginURL = "http://192.168.217.29/AC-Controller/getdata.php";
+String keepAliveURL = "http://192.168.217.29/AC-Controller/user.php";
 String getData, Link;
 String OldCardID = "";         // To track the previous card ID
 String currentCardID = "";     // To track the currently logged-in card ID

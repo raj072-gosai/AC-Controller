@@ -37,7 +37,7 @@ const char *ssid = "Raj";
 const char *password = "12345678";
 const char *device_token = "f0d27163a1cae5f3";
 //************************************************************************
-String URL = "http://192.168.97.29/AC-Controller/getdata.php";  // computer IP or the server domain
+String URL = "http://192.168.217.29/AC-Controller/getdata.php";  // computer IP or the server domain
 String getData, Link;
 String OldCardID = "";
 String currentCardID = ""; // Track the currently logged-in card ID
